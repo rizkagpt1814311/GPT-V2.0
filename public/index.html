@@ -1477,6 +1477,18 @@ const DEFAULT_KNOWLEDGE = [
                     apiConfig: encConfig, aiPriority: state.aiPriority
                 }));
                 updateStorageMetrics();
+                // Share only non-secret settings; API keys must stay on a trusted backend.
+                if (window.__firebase?.isAdmin && window.__savePublicAdminSettings) {
+                    window.__savePublicAdminSettings({
+                        defaultModel: state.defaultModel,
+                        enabledModels: state.enabledModels,
+                        systemPrompt: state.systemPrompt,
+                        aiPriority: state.aiPriority
+                    }).catch(err => {
+                        console.error('Could not publish shared settings:', err);
+                        showToast('Local settings saved, but shared settings failed to publish', 'error');
+                    });
+                }
                 return true;
             } catch (err) { showToast("Failed to save admin configuration", "error"); return false; }
         }
@@ -4501,6 +4513,33 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
         const db = getFirestore(fbApp);
         const storage = getStorage(fbApp);
 
+        // The appConfig/public document contains PUBLIC settings only.
+        // Never put Groq, Gemini or other provider API keys in this document.
+        window.__savePublicAdminSettings = async (settings) => {
+            if (!auth.currentUser || !window.__firebase?.isAdmin) throw new Error('Admin required');
+            await setDoc(doc(db, 'appConfig', 'public'), {
+                defaultModel: settings.defaultModel,
+                enabledModels: settings.enabledModels,
+                systemPrompt: settings.systemPrompt,
+                aiPriority: settings.aiPriority,
+                updatedAt: serverTimestamp()
+            }, { merge: true });
+        };
+        let publicSettingsUnsub = null;
+        function subscribePublicSettings() {
+            if (publicSettingsUnsub) publicSettingsUnsub();
+            publicSettingsUnsub = onSnapshot(doc(db, 'appConfig', 'public'), snap => {
+                if (!snap.exists() || !window.state) return;
+                const data = snap.data();
+                const st = window.state;
+                if (Array.isArray(data.enabledModels) && data.enabledModels.length) st.enabledModels = data.enabledModels;
+                if (typeof data.defaultModel === 'string' && data.defaultModel) st.defaultModel = data.defaultModel;
+                if (typeof data.systemPrompt === 'string') st.systemPrompt = data.systemPrompt;
+                if (Array.isArray(data.aiPriority)) st.aiPriority = data.aiPriority;
+                window.renderModelSelects?.();
+            }, err => console.error('Shared settings unavailable:', err));
+        }
+
         const $$ = (id) => document.getElementById(id);
         const DEFAULT_LIMITS = {
             dailyMessageLimit: 50, monthlyMessageLimit: 1000,
@@ -4826,6 +4865,7 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
             if (!window.__appInited) { window.initApp && window.initApp(); window.__appInited = true; }
             else { window.applyTheme && window.applyTheme(); window.applyAiTheme && window.applyAiTheme(); }
 
+            subscribePublicSettings();
             attachChatsListener(currentUser.uid);
 
             $$('fb-header-avatar').src = currentProfile.photoURL || '';
@@ -4840,6 +4880,7 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
         }
 
         onAuthStateChanged(auth, async (user) => {
+            if (publicSettingsUnsub) { publicSettingsUnsub(); publicSettingsUnsub = null; }
             if (chatsUnsub) { chatsUnsub(); chatsUnsub = null; }
             lastSyncedChatJSON.clear();
             appBooted = false;
