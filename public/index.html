@@ -2038,7 +2038,37 @@ Return at most 3 items. If nothing is worth remembering, return [].`;
         // Falls back to the next enabled provider only for pre-stream failures
         // (missing/invalid key, rate limit, unavailable model, timeout, 5xx) — never
         // mid-stream, so a partial answer already shown to the user is never discarded.
+        // Shared Groq backend: the API key stays in Cloudflare, never in this page.
+        const RIZKA_CHAT_WORKER = 'https://rizka-gpt-api.rishagarankrizwinth.workers.dev/chat';
+        async function callSharedGroq(apiMessages, signal, onDelta) {
+            const user = window.__firebase?.auth?.currentUser;
+            if (!user) throw { stage: 'pre', friendly: 'Please sign in again.' };
+            const token = await user.getIdToken();
+            let response;
+            try {
+                response = await fetch(RIZKA_CHAT_WORKER, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+                    body: JSON.stringify({ messages: apiMessages.slice(-30).map(m => ({role: m.role, content: String(m.content || '').slice(0, 12000)})) }),
+                    signal
+                });
+            } catch (error) {
+                if (signal?.aborted) throw error;
+                throw { stage: 'pre', friendly: 'Cannot reach the RizKa AI service. Please try again.' };
+            }
+            const result = await response.json().catch(() => ({}));
+            if (!response.ok) throw { stage: 'pre', status: response.status, friendly: result.error || 'AI service unavailable.' };
+            if (!result.message) throw { stage: 'pre', friendly: 'The AI returned an empty response.' };
+            onDelta(result.message);
+            return { providerId: 'groq', model: result.model || 'openai/gpt-oss-120b' };
+        }
+
         async function callAI(apiMessages, signal, onDelta, opts = {}) {
+            // All signed-in users use the admin-owned server-side Groq key.
+            if (window.__firebase?.auth?.currentUser) {
+                return await callSharedGroq(apiMessages, signal, onDelta);
+            }
+
             const providers = state.aiPriority.filter(id => state.apiConfig[id] && state.apiConfig[id].enabled && state.apiConfig[id].apiKey);
             if (!providers.length) throw { friendly: 'RizKa GPT is not configured yet. Please contact the administrator.' };
             let lastErr = null;
@@ -2703,7 +2733,7 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
                     apiMessages.push({ role: m.role, content: contentPayload });
                 });
 
-                const hasAnyProvider = state.aiPriority.some(id => state.apiConfig[id]?.enabled && state.apiConfig[id]?.apiKey);
+                const hasAnyProvider = !!window.__firebase?.auth?.currentUser || state.aiPriority.some(id => state.apiConfig[id]?.enabled && state.apiConfig[id]?.apiKey);
                 if (!hasAnyProvider) {
                     assistantMsg.content = "RizKa GPT is not configured yet. Please contact the administrator.";
                     assistantMsg.isError = true;
