@@ -350,6 +350,36 @@
         .rz-src b{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-weight:600;line-height:1.35}
         .rz-src span:not(.rz-src-h span){display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--rz-mut);margin-top:.2rem}
         .rz-src em{display:block;font-style:normal;font-size:.68rem;color:var(--rz-mut);margin-top:.3rem}
+        /* Smart inline images */
+        .rz-img-ask-btn{display:inline-flex;align-items:center;gap:.4rem;border:1px solid var(--rz-line);background:var(--rz-card);color:var(--rz-fg);font-size:.78rem;padding:.4rem .75rem;border-radius:10px;cursor:pointer;transition:border-color .15s,transform .15s}
+        .rz-img-ask-btn:hover{border-color:var(--rz-acc);transform:translateY(-1px)}
+        .rz-img-ask-btn svg{width:14px;height:14px}
+        .rz-img-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:.7rem;margin:.7rem 0 1rem}
+        .rz-img-card{border:1px solid var(--rz-line);background:var(--rz-card);border-radius:14px;overflow:hidden;animation:msgIn .25s ease-out both}
+        .rz-img-frame{position:relative;aspect-ratio:4/3;background:var(--rz-line);overflow:hidden}
+        .rz-img-frame img{width:100%;height:100%;object-fit:cover;display:block;cursor:zoom-in;transition:transform .2s}
+        .rz-img-frame img:hover{transform:scale(1.03)}
+        .rz-img-broken-note{display:none;position:absolute;inset:0;align-items:center;justify-content:center;gap:.4rem;flex-direction:column;font-size:.7rem;color:var(--rz-mut)}
+        .rz-img-broken .rz-img-broken-note{display:flex}
+        .rz-img-card figcaption{padding:.55rem .65rem .65rem}
+        .rz-img-cap{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;font-size:.76rem;font-weight:600;line-height:1.3}
+        .rz-img-attr{display:block;font-size:.68rem;color:var(--rz-mut);margin-top:.2rem}
+        .rz-img-actions{display:flex;flex-wrap:wrap;gap:.35rem;margin-top:.5rem}
+        .rz-img-btn{display:inline-flex;align-items:center;gap:.3rem;border:1px solid var(--rz-line);background:transparent;color:var(--rz-mut);font-size:.68rem;padding:.28rem .5rem;border-radius:8px;cursor:pointer;text-decoration:none;transition:border-color .15s,color .15s}
+        .rz-img-btn:hover{border-color:var(--rz-acc);color:var(--rz-fg)}
+        .rz-img-btn svg{width:12px;height:12px}
+        #image-lightbox{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:60;display:flex;align-items:center;justify-content:center;padding:2rem}
+        #image-lightbox.hidden{display:none}
+        .rz-lb-inner{max-width:min(92vw,900px);max-height:88vh;display:flex;flex-direction:column;gap:.6rem}
+        .rz-lb-inner img{max-width:100%;max-height:70vh;object-fit:contain;border-radius:10px;margin:0 auto;display:block}
+        .rz-lb-meta{color:#e2e8f0;font-size:.8rem;text-align:center}
+        .rz-lb-meta .rz-img-attr{color:#94a3b8}
+        .rz-lb-actions{display:flex;justify-content:center;gap:.5rem;flex-wrap:wrap}
+        .rz-lb-close,.rz-lb-nav{position:absolute;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.2);color:#fff;border-radius:999px;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+        .rz-lb-close{top:1.2rem;right:1.2rem}
+        .rz-lb-nav.prev{left:1.2rem;top:50%;transform:translateY(-50%)}
+        .rz-lb-nav.next{right:1.2rem;top:50%;transform:translateY(-50%)}
+        @media (max-width:640px){.rz-img-grid{grid-template-columns:repeat(auto-fill,minmax(45%,1fr))}.rz-lb-nav{display:none}}
         .rz-files{border:1px solid var(--rz-line);background:var(--rz-card);border-radius:14px;margin:1rem 0;overflow:hidden}
         .rz-files-h{display:flex;align-items:center;justify-content:space-between;gap:.5rem;padding:.6rem .9rem;font-size:.8rem;font-weight:600;border-bottom:1px solid var(--rz-line)}
         .rz-file{display:flex;align-items:center;gap:.7rem;padding:.65rem .9rem;border-top:1px solid var(--rz-line)}.rz-file:first-of-type{border-top:0}
@@ -1019,6 +1049,19 @@
                     <input type="checkbox" id="setting-enter-send" class="w-4 h-4 rounded bg-dark-850 border-slate-800 text-white focus:ring-0 cursor-pointer">
                 </div>
 
+                <!-- Auto Images -->
+                <div class="space-y-2">
+                    <div>
+                        <span class="font-semibold text-white block">Auto Images</span>
+                        <span class="text-[11px] text-slate-500">Show verified real photographs inline when they'd help explain a place, animal, plant or object. Never AI-generated — sourced from Wikimedia Commons.</span>
+                    </div>
+                    <select id="setting-auto-images" class="w-full bg-dark-850 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-slate-600">
+                        <option value="on">On — fetch automatically when relevant</option>
+                        <option value="ask">Ask — show a "View related images" button</option>
+                        <option value="off">Off — never fetch images</option>
+                    </select>
+                </div>
+
                 <!-- AI Interface Theme -->
                 <div class="space-y-2">
                     <div>
@@ -1042,6 +1085,24 @@
                 <button id="btn-save-settings" class="px-4 py-1.5 bg-white text-dark-950 font-semibold rounded-lg hover:bg-slate-200 text-xs">Save Settings</button>
             </div>
         </div>
+    </div>
+
+    <!-- Image Lightbox (full-size view for Smart Inline Images) -->
+    <div id="image-lightbox" class="hidden" role="dialog" aria-modal="true" aria-label="Image viewer">
+        <button class="rz-lb-close" id="lightbox-close" aria-label="Close"><i data-lucide="x"></i></button>
+        <button class="rz-lb-nav prev" id="lightbox-prev" aria-label="Previous image"><i data-lucide="chevron-left"></i></button>
+        <div class="rz-lb-inner">
+            <img id="lightbox-img" src="" alt="">
+            <div class="rz-lb-meta">
+                <div id="lightbox-caption"></div>
+                <span class="rz-img-attr" id="lightbox-attr"></span>
+            </div>
+            <div class="rz-lb-actions">
+                <button class="rz-img-btn" id="lightbox-download"><i data-lucide="download"></i> Download</button>
+                <a class="rz-img-btn" id="lightbox-source" href="#" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Source & license</a>
+            </div>
+        </div>
+        <button class="rz-lb-nav next" id="lightbox-next" aria-label="Next image"><i data-lucide="chevron-right"></i></button>
     </div>
 
     <!-- Add/Edit Knowledge Item Modal -->
@@ -1083,7 +1144,7 @@
          Must load before the main app script below. NOTE: requires this page to be
          served over http(s) (e.g. `npx serve`, `python -m http.server`, etc.) — opening
          index.html directly via file:// blocks fetch() for local files in most browsers. -->
-    <script src="knowledge-loader.js"></script>
+    <script src="js/knowledge-loader.js"></script>
 
     <script>
         /* ==========================================================================
@@ -1155,7 +1216,7 @@ let KNOWLEDGE_INSTRUCTIONS = "";
             selectedModel: "openai/gpt-oss-120b",
             defaultModel: "openai/gpt-oss-120b",
             enabledModels: ["openai/gpt-oss-20b", "openai/gpt-oss-120b"],
-            settings: { enterToSend: true, theme: 'dark', aiTheme: 'rizka' },
+            settings: { enterToSend: true, theme: 'dark', aiTheme: 'rizka', autoImages: 'on' },
             live: { enabled: false, provider: 'tavily', endpoint: '', key: '', depth: 'basic', max: 5, timeout: 15 },
             files: { enabled: true, maxKB: 10240, maxFiles: 10, types: ['txt','md','json','csv','html','css','js','ts','py','java','cpp','c','xml','svg','sql','yaml','yml'] },
             apiConfig: defaultApiConfig(),
@@ -1809,6 +1870,7 @@ Return at most 3 items. If nothing is worth remembering, return [].`;
             renderModelSelects();
             renderAiThemeGrid();
             document.getElementById('setting-enter-send').checked = state.settings.enterToSend;
+            document.getElementById('setting-auto-images').value = state.settings.autoImages || 'on';
 
             renderChatList();
 
@@ -2232,6 +2294,154 @@ Return at most 3 items. If nothing is worth remembering, return [].`;
             return `<div class="rz-updated">Updated as of ${d} · based on live sources</div><div class="rz-sources">${s.sources.map((x, i) => `<a class="rz-src" href="${E(x.url)}" target="_blank" rel="noopener noreferrer"><div class="rz-src-h"><i data-lucide="globe"></i><span>${i + 1}. ${E(x.domain)}</span><i data-lucide="arrow-up-right" style="margin-left:auto"></i></div><b>${E(x.title)}</b><span>${E(x.snippet)}</span>${x.date ? `<em>${E(x.date)}</em>` : ''}</a>`).join('')}</div>`;
         }
 
+        /* ================= SMART INLINE IMAGES =================
+           Real, verified photographs (never AI-generated) fetched from the
+           Wikimedia Commons API — a free, keyless, CC-licensed image source,
+           so no backend proxy or secret API key is required. If you later
+           swap in a paid provider (e.g. Bing Image Search, Pexels, Unsplash),
+           keep the key on a server-side proxy endpoint and have fetchImages()
+           call that endpoint instead of calling the provider directly from
+           the browser — never ship a paid image-API key in client code.
+
+           Message shape (mirrors msg.search):
+             msg.images = {
+               state: 'idle' | 'searching' | 'done' | 'failed' | 'skipped',
+               items: [{ url, alt, caption, sourceUrl, attribution }]
+             }
+           This is plain JSON on the message object, so it persists with the
+           rest of chat.messages through the existing saveState()/localStorage
+           and Firebase sync — no extra persistence code needed. ================= */
+        const IMAGE_HOST_ALLOWLIST = ['upload.wikimedia.org', 'commons.wikimedia.org'];
+        const NON_VISUAL_RE = /\b(code|function|script|css|html|json|api|regex|formula|equation|debug|error|stack trace|sql|query|algorithm|refactor|compile|syntax)\b/i;
+        const VISUAL_RE = /\b(explain|what is|what are|what does .* look like|tell me about|describe|show me|picture|photo|image|looks? like|animal|plant|flower|bird|tree|landmark|mountain|beach|temple|monument|city|country|island|waterfall|castle|building|architecture|painting|species)\b/i;
+        function needsImages(q) {
+            q = q || '';
+            if (NON_VISUAL_RE.test(q)) return false;
+            return VISUAL_RE.test(q);
+        }
+        function imageSubjectFromQuery(q) {
+            // Keep it short & concrete for a media search — strip conversational filler.
+            return String(q || '').replace(/\b(please|can you|could you|explain|tell me about|what is|what are|describe|show me( a| an)? (picture|photo|image) of|looks? like)\b/gi, '').replace(/[?!.]+$/g, '').trim().slice(0, 80) || q;
+        }
+        async function fetchImages(query, signal) {
+            const subject = imageSubjectFromQuery(query);
+            const endpoint = 'https://commons.wikimedia.org/w/api.php?' + new URLSearchParams({
+                action: 'query', generator: 'search', gsrsearch: `intitle:${subject} filetype:bitmap`,
+                gsrnamespace: '6', gsrlimit: '6', prop: 'imageinfo', iiprop: 'url|extmetadata',
+                iiurlwidth: '640', format: 'json', origin: '*'
+            });
+            const ctl = new AbortController();
+            const t = setTimeout(() => ctl.abort(), 12000);
+            if (signal) signal.addEventListener('abort', () => ctl.abort());
+            try {
+                const r = await fetch(endpoint, { signal: ctl.signal });
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                const data = await r.json();
+                const pages = Object.values(data?.query?.pages || {});
+                const items = pages.map(p => {
+                    const info = p.imageinfo && p.imageinfo[0];
+                    if (!info) return null;
+                    const thumb = info.thumburl || info.url;
+                    const full = info.url;
+                    let host = ''; try { host = new URL(thumb).hostname; } catch (e) {}
+                    if (!/^https:\/\//i.test(thumb) || !IMAGE_HOST_ALLOWLIST.includes(host)) return null;
+                    const meta = info.extmetadata || {};
+                    const strip = (h) => String(h || '').replace(/<[^>]+>/g, '').trim();
+                    const title = (p.title || '').replace(/^File:/, '').replace(/\.\w+$/, '').replace(/[_-]+/g, ' ');
+                    return {
+                        url: thumb,
+                        fullUrl: /^https:\/\//i.test(full) ? full : thumb,
+                        alt: strip(meta.ImageDescription?.value) || title || subject,
+                        caption: (strip(meta.ObjectName?.value) || title || subject).slice(0, 140),
+                        sourceUrl: info.descriptionurl || 'https://commons.wikimedia.org',
+                        attribution: [strip(meta.Artist?.value), strip(meta.LicenseShortName?.value)].filter(Boolean).join(' · ') || 'Wikimedia Commons'
+                    };
+                }).filter(Boolean).slice(0, 3);
+                return items;
+            } finally { clearTimeout(t); }
+        }
+        function imageStatusHTML(msg) {
+            const s = msg.images; if (!s) return '';
+            if (s.state === 'searching') return '<div class="rz-status" role="status"><span class="rz-spin"></span> Finding related images…</div>';
+            if (s.state === 'failed') return '<div class="rz-status"><i data-lucide="image-off"></i> Couldn\'t find verified images for this.</div>';
+            if (s.state === 'idle') return `<div class="rz-status rz-img-ask"><button class="rz-img-ask-btn" data-act="view-images"><i data-lucide="images"></i> View related images</button></div>`;
+            return '';
+        }
+        function imageCardsHTML(msg) {
+            const s = msg.images, E = escapeHtml;
+            if (!s || s.state !== 'done' || !s.items || !s.items.length) return '';
+            return `<div class="rz-img-grid">${s.items.map((im, i) => `
+                <figure class="rz-img-card">
+                    <div class="rz-img-frame">
+                        <img src="${E(im.url)}" alt="${E(im.alt)}" loading="lazy" decoding="async" data-act="img-view" data-i="${i}"
+                             onerror="this.closest('.rz-img-card').classList.add('rz-img-broken'); this.remove();">
+                        <div class="rz-img-broken-note"><i data-lucide="image-off"></i> Image unavailable</div>
+                    </div>
+                    <figcaption>
+                        <span class="rz-img-cap">${E(im.caption)}</span>
+                        <span class="rz-img-attr">${E(im.attribution)}</span>
+                        <div class="rz-img-actions">
+                            <button class="rz-img-btn" title="View full size" data-act="img-view" data-i="${i}"><i data-lucide="expand"></i> View</button>
+                            <button class="rz-img-btn" title="Download image" data-act="img-download" data-i="${i}"><i data-lucide="download"></i> Download</button>
+                            <a class="rz-img-btn" title="View source & license on Wikimedia Commons" href="${E(im.sourceUrl)}" target="_blank" rel="noopener noreferrer"><i data-lucide="external-link"></i> Source</a>
+                        </div>
+                    </figcaption>
+                </figure>`).join('')}</div>`;
+        }
+        function setImageStatus(idx, msg) {
+            const el = document.getElementById('msg-images-' + idx);
+            if (el) { el.innerHTML = imageStatusHTML(msg) + imageCardsHTML(msg); lucide.createIcons(); }
+        }
+        async function runImageSearch(chat, msg, idx, query) {
+            msg.images = { state: 'searching' }; setImageStatus(idx, msg);
+            try {
+                const items = await fetchImages(query);
+                msg.images = items.length ? { state: 'done', items } : { state: 'failed' };
+            } catch (e) { msg.images = { state: 'failed' }; }
+            setImageStatus(idx, msg);
+            saveState();
+        }
+        function requestImagesForMessage(idx) {
+            const chat = activeChat(); if (!chat) return;
+            const msg = chat.messages[idx]; if (!msg) return;
+            const q = chat.messages.slice(0, idx).filter(m => m.role === 'user').slice(-1)[0]?.content || '';
+            runImageSearch(chat, msg, idx, q);
+        }
+        function openImageLightbox(items, index) {
+            if (!items || !items[index]) return;
+            lightboxState = { items, index };
+            renderLightbox();
+            $('image-lightbox').classList.remove('hidden');
+        }
+        let lightboxState = null;
+        function renderLightbox() {
+            if (!lightboxState) return;
+            const im = lightboxState.items[lightboxState.index];
+            $('lightbox-img').src = im.fullUrl || im.url;
+            $('lightbox-img').alt = im.alt || '';
+            $('lightbox-caption').textContent = im.caption || '';
+            $('lightbox-attr').textContent = im.attribution || '';
+            $('lightbox-source').href = im.sourceUrl || '#';
+            $('lightbox-download').onclick = () => downloadImage(im.fullUrl || im.url, (im.caption || 'image').replace(/[^a-z0-9]+/gi, '_').slice(0, 40));
+            $('lightbox-prev').classList.toggle('hidden', lightboxState.items.length < 2);
+            $('lightbox-next').classList.toggle('hidden', lightboxState.items.length < 2);
+        }
+        function closeLightbox() { $('image-lightbox').classList.add('hidden'); lightboxState = null; }
+        async function downloadImage(url, filename) {
+            try {
+                const r = await fetch(url);
+                const blob = await r.blob();
+                const objUrl = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = objUrl; a.download = (filename || 'image') + '.jpg';
+                document.body.appendChild(a); a.click(); a.remove();
+                setTimeout(() => URL.revokeObjectURL(objUrl), 4000);
+            } catch (e) {
+                showToast('Could not download image directly — opening it in a new tab instead.', 'info');
+                window.open(url, '_blank', 'noopener');
+            }
+        }
+
         /* ================= FILE GENERATION ================= */
         const EXT_MIME = { txt: 'text/plain', md: 'text/markdown', json: 'application/json', csv: 'text/csv', html: 'text/html', css: 'text/css', js: 'text/javascript', ts: 'text/plain', py: 'text/x-python', java: 'text/x-java-source', cpp: 'text/x-c++src', c: 'text/x-csrc', xml: 'application/xml', svg: 'image/svg+xml', sql: 'application/sql', yaml: 'text/yaml', yml: 'text/yaml' };
         const ALL_TYPES = Object.keys(EXT_MIME);
@@ -2454,7 +2664,8 @@ Return at most 3 items. If nothing is worth remembering, return [].`;
             if (fmt === 'json') return downloadBlob(`${base}.json`, JSON.stringify(c, null, 2), 'application/json');
             if (fmt === 'txt') return downloadBlob(`${base}.txt`, c.messages.map(m => `${who(m)}:\n${m.content}`).join('\n\n'), 'text/plain');
             if (fmt === 'md') return downloadBlob(`${base}.md`, `# ${c.title}\n\n` + c.messages.map(m => `### ${who(m)}\n\n${m.content}`).join('\n\n'), 'text/markdown');
-            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(c.title)}</title><style>body{font:15px/1.65 system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#1f2430}.u{background:#eef0f4;border-radius:14px;padding:.6rem 1rem;margin:1rem 0 1rem auto;width:fit-content;max-width:85%;white-space:pre-wrap}table{border-collapse:collapse}td,th{border:1px solid #ccd;padding:.4rem .7rem}pre{background:#f4f5f8;padding:.8rem;overflow:auto}</style></head><body><h1>${escapeHtml(c.title)}</h1>${c.messages.map(m => m.role === 'user' ? `<div class="u">${escapeHtml(m.content)}</div>` : `<div>${DOMPurify.sanitize(marked.parse(m.content.replace(/^:::file[\s\S]*?\n:::$/gm, '[generated file]')))}</div>`).join('')}</body></html>`;
+            const imgHtml = (m) => (m.images && m.images.state === 'done' && m.images.items?.length) ? `<div class="imgs">${m.images.items.map(im => `<figure><img src="${escapeHtml(im.url)}" alt="${escapeHtml(im.alt)}"><figcaption>${escapeHtml(im.caption)} — ${escapeHtml(im.attribution)}</figcaption></figure>`).join('')}</div>` : '';
+            const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><title>${escapeHtml(c.title)}</title><style>body{font:15px/1.65 system-ui,sans-serif;max-width:800px;margin:2rem auto;padding:0 1rem;color:#1f2430}.u{background:#eef0f4;border-radius:14px;padding:.6rem 1rem;margin:1rem 0 1rem auto;width:fit-content;max-width:85%;white-space:pre-wrap}table{border-collapse:collapse}td,th{border:1px solid #ccd;padding:.4rem .7rem}pre{background:#f4f5f8;padding:.8rem;overflow:auto}.imgs{display:flex;flex-wrap:wrap;gap:.6rem;margin:.6rem 0}.imgs figure{width:220px;margin:0;font-size:12px;color:#666}.imgs img{width:100%;border-radius:8px}</style></head><body><h1>${escapeHtml(c.title)}</h1>${c.messages.map(m => m.role === 'user' ? `<div class="u">${escapeHtml(m.content)}</div>` : `<div>${DOMPurify.sanitize(marked.parse(m.content.replace(/^:::file[\s\S]*?\n:::$/gm, '[generated file]')))}${imgHtml(m)}</div>`).join('')}</body></html>`;
             if (fmt === 'html') return downloadBlob(`${base}.html`, html, 'text/html');
             const w = window.open('', '_blank'); if (!w) return showToast('Allow pop-ups to print', 'error');
             w.document.write(html); w.document.close(); w.focus(); setTimeout(() => w.print(), 300);
@@ -2579,7 +2790,8 @@ Return at most 3 items. If nothing is worth remembering, return [].`;
             else if (!msg.content) body = `<div class="rz-typing" role="status" aria-label="RizKa GPT is thinking"><span></span><span></span><span></span></div>`;
             else body = renderRich(msg.content, streaming);
             const actions = streaming ? '' : `<div class="rz-actions">${msg.isError ? '' : actBtn('copy', 'copy', 'Copy') + actBtn('like', 'thumbs-up', 'Good response')}${actBtn('retry', 'rotate-cw', 'Regenerate response')}${msg.isError ? '' : actBtn('fresh', 'globe', 'Search latest information') + actBtn('speak', 'volume-2', 'Read aloud') + actBtn('share', 'share-2', 'Share')}${actBtn('delete', 'trash-2', 'Delete message')}</div>`;
-            div.innerHTML = `<div class="rz-ai-row"><div class="rz-avatar" aria-hidden="true"><i data-lucide="sparkles"></i></div><div class="rz-ai-body"><div id="msg-status-${idx}">${searchStatusHTML(msg)}</div><div class="rz-prose prose${streaming ? '' : ' rz-animate'}" id="msg-content-${idx}">${body}</div>${streaming ? '' : searchFooterHTML(msg)}${actions}</div></div>`;
+            const imagesBlock = streaming ? '' : `<div id="msg-images-${idx}">${imageStatusHTML(msg)}${imageCardsHTML(msg)}</div>`;
+            div.innerHTML = `<div class="rz-ai-row"><div class="rz-avatar" aria-hidden="true"><i data-lucide="sparkles"></i></div><div class="rz-ai-body"><div id="msg-status-${idx}">${searchStatusHTML(msg)}</div><div class="rz-prose prose${streaming ? '' : ' rz-animate'}" id="msg-content-${idx}">${body}</div>${imagesBlock}${streaming ? '' : searchFooterHTML(msg)}${actions}</div></div>`;
             if (msg.feedback === 'up') div.querySelector('[data-act="like"]')?.classList.add('on');
             enhanceCode(div);
             return div;
@@ -2803,6 +3015,13 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
                         : "The model returned an empty response. Please try again." };
                 }
 
+                // Smart inline images: never fabricated, always a real verified
+                // lookup — decide only whether/when to trigger it here.
+                const autoImg = state.settings.autoImages || 'on';
+                if (autoImg !== 'off' && needsImages(lastQ)) {
+                    assistantMsg.images = autoImg === 'ask' ? { state: 'idle' } : { state: 'searching' };
+                }
+
             } catch (err) {
                 let m = null;
                 if (err && err.friendly) m = err.friendly;
@@ -2837,6 +3056,11 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
                     // Fire-and-forget: distill durable facts for future conversations
                     // without blocking or delaying the UI.
                     updateMemoryFromExchange(chat, lastUserMessage, assistantMsg);
+                    // Fire-and-forget: fetch verified images without blocking or
+                    // re-flowing the already-finalized text response.
+                    if (assistantMsg.images && assistantMsg.images.state === 'searching') {
+                        runImageSearch(chat, assistantMsg, assistantMsgIndex, lastUserMessage ? lastUserMessage.content : '');
+                    }
                 }
             }
         }
@@ -3551,6 +3775,18 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
                 document.getElementById('settings-modal').classList.add('hidden');
             });
 
+            // Image lightbox (Smart Inline Images — full-size view)
+            $('lightbox-close').onclick = closeLightbox;
+            $('image-lightbox').addEventListener('click', (e) => { if (e.target.id === 'image-lightbox') closeLightbox(); });
+            $('lightbox-prev').onclick = () => { if (!lightboxState) return; lightboxState.index = (lightboxState.index - 1 + lightboxState.items.length) % lightboxState.items.length; renderLightbox(); };
+            $('lightbox-next').onclick = () => { if (!lightboxState) return; lightboxState.index = (lightboxState.index + 1) % lightboxState.items.length; renderLightbox(); };
+            document.addEventListener('keydown', (e) => {
+                if ($('image-lightbox').classList.contains('hidden')) return;
+                if (e.key === 'Escape') closeLightbox();
+                else if (e.key === 'ArrowLeft') $('lightbox-prev').click();
+                else if (e.key === 'ArrowRight') $('lightbox-next').click();
+            });
+
             // New Chat buttons
             document.getElementById('btn-quick-new-chat').onclick = createNewChat;
             document.getElementById('btn-sidebar-new-chat').onclick = createNewChat;
@@ -3596,6 +3832,7 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
             $('btn-save-settings').onclick = () => {
                 if (state.enabledModels.includes($('settings-model-select').value)) state.selectedModel = $('settings-model-select').value;
                 state.settings.enterToSend = $('setting-enter-send').checked;
+                state.settings.autoImages = $('setting-auto-images').value;
                 saveState(); renderModelSelects();
                 $('settings-modal').classList.add('hidden');
                 showToast("Settings saved successfully", "success");
@@ -3658,6 +3895,9 @@ Supported: txt md json csv html css js ts py java cpp c xml svg sql yaml. If ask
                     case 'like': m.feedback = m.feedback === 'up' ? null : 'up'; saveState(); b.classList.toggle('on', m.feedback === 'up'); showToast(m.feedback ? 'Thanks for the feedback' : 'Feedback removed', 'info'); break;
                     case 'speak': speakMessage(row, b); break;
                     case 'share': shareMessage(m); break;
+                    case 'view-images': requestImagesForMessage(idx); break;
+                    case 'img-view': { const im = m.images?.items?.[+b.dataset.i]; if (im) openImageLightbox(m.images.items, +b.dataset.i); break; }
+                    case 'img-download': { const im = m.images?.items?.[+b.dataset.i]; if (im) downloadImage(im.fullUrl || im.url, (im.caption || 'image').replace(/[^a-z0-9]+/gi, '_').slice(0, 40)); break; }
                 }
             });
             const scroller = $('chat-messages-container'), jump = $('btn-jump-latest');
