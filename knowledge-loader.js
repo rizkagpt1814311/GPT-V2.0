@@ -31,8 +31,8 @@
 (function (global) {
     'use strict';
 
-    const KNOWLEDGE_URL = 'knowledge/rizwinth.json';
-    const INSTRUCTIONS_URL = 'knowledge/instructions.txt';
+    const KNOWLEDGE_URL = 'rizwinth.json';
+    const INSTRUCTIONS_URL = 'instructions.txt';
 
     // localStorage keys used purely as an offline/error fallback cache, so a
     // user who has successfully loaded the files once won't lose them if a
