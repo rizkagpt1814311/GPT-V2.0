@@ -92,6 +92,17 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
+    // Shared non-secret settings; never store API keys here.
+    match /appConfig/public {
+      allow read: if isSignedIn();
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['defaultModel', 'enabledModels', 'systemPrompt', 'aiPriority', 'updatedAt'])
+        && request.resource.data.defaultModel is string
+        && request.resource.data.enabledModels is list
+        && request.resource.data.systemPrompt is string;
+      allow delete: if isAdmin();
+    }
+
     // Default deny
     match /{document=**} {
       allow read, write: if false;
